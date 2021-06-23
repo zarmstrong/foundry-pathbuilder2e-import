@@ -1,18 +1,18 @@
 Hooks.on('renderActorSheet', function(obj, html){
+  if(!game.modules.get('herovaultfoundry')?.active) {
 
-  // Only inject the link if the actor is of type "character" and the user has permission to update it
-  const actor = obj.actor;
-  // if (!(actor.data.type === "character" && actor.can(game.user, "update"))) return;
+    // Only inject the link if the actor is of type "character" and the user has permission to update it
+    const actor = obj.actor;
+    // if (!(actor.data.type === "character" && actor.can(game.user, "update"))) return;
 
-  let element = html.find(".window-header .window-title");
-  if (element.length != 1) return;
+    let element = html.find(".window-header .window-title");
+    if (element.length != 1) return;
 
-  let button = $(`<a class="popout" style><i class="fas fa-book"></i>Import from Pathbuilder 2e</a>`);
-  button.on('click', () => beginPathbuilderImport(obj.object));
-  element.after(button);
-  }
-   
-);
+    let button = $(`<a class="popout" style><i class="fas fa-book"></i>Import from Pathbuilder 2e</a>`);
+    button.on('click', () => beginPathbuilderImport(obj.object));
+    element.after(button);
+   }
+});
 
 var applyChanges = false;
 var finishedFeats = false;
