@@ -1542,13 +1542,10 @@ async function setSpellcasters(targetActor, arraySpellcasters) {
                   if (
                     getSlug(spellListObject.list[ref]) == action.slug || getSlugNoQuote(spellListObject.list[ref]) == action.slug
                   ) {
-                    const clonedData = JSON.parse(JSON.stringify(action.data));
-                    clonedData.data.location.value = spellCaster.instance[0].id;
-                    if (spellListObject.spellLevel ==0)
-                      clonedData.data.level.value = 1;
-                    else
-                      clonedData.data.level.value = spellListObject.spellLevel;
-                    allItems.push(clonedData);
+                    const heightenedLevel = spellListObject.spellLevel;
+                    const heightenedUpdate = { "system.location.heightenedLevel": heightenedLevel}
+                    const clonedSpell = action.clone({ "system.location.value": spellCaster.instance[0].id, ...heightenedUpdate }).toObject();
+                    allItems.push(clonedSpell);
                     break;
                   }
                 }
