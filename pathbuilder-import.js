@@ -50,7 +50,7 @@ Hooks.on("herovaultfoundryReady", (api) => {
 Hooks.on("renderActorSheet", async function (obj, html) {
   // Only inject the link if the actor is of type "character" and the user has permission to update it
   const actor = obj.actor;
-  if (!(actor.data.type === "character")) {
+  if (!(actor.type === "character")) {
     return;
   }
   if (actor.canUserModify(game.user, "update") == false) {
@@ -255,18 +255,18 @@ function checkCharacterIsCorrect(targetActor, jsonBuild) {
 }
 
 function shouldBeManuallyDeleted(i) {
-  // if (i.data.type=="ancestry"){
+  // if (i.type=="ancestry"){
   //   return false;
   // }
-  if (i.data.type == "feat") {
-    if (i.data.data.featType.value == "ancestryfeature") {
+  if (i.type == "feat") {
+    if (i.featType.value == "ancestryfeature") {
       return false;
     }
   }
-  if (i.data.type == "spell") {
+  if (i.type == "spell") {
     return false;
   }
-  if (i.data.type == "spellcastingEntry") {
+  if (i.type == "spellcastingEntry") {
     return false;
   }
   return true;
@@ -274,7 +274,7 @@ function shouldBeManuallyDeleted(i) {
 
 async function importCharacter(targetActor, jsonBuild) {
   if (deleteAll) {
-    // const items = targetActor.data.items.filter(i => shouldBeManuallyDeleted(i));
+    // const items = targetActor.items.filter(i => shouldBeManuallyDeleted(i));
     // const deletions = items.map(i => i.id);
     // console.log(deletions)
     // const updated = await targetActor.deleteEmbeddedDocuments("Item", deletions);
@@ -284,7 +284,7 @@ async function importCharacter(targetActor, jsonBuild) {
         pbcolor1,
         pbcolor4
       );
-    // let deletions = targetActor.data.items.map((i) => i.id);
+    // let deletions = targetActor.items.map((i) => i.id);
     // let updated = await targetActor.deleteEmbeddedDocuments("Item", deletions);
     let updated = await targetActor.deleteEmbeddedDocuments("Item", ["123"], {
       deleteAll: true,
@@ -296,7 +296,7 @@ async function importCharacter(targetActor, jsonBuild) {
         pbcolor1,
         pbcolor4
       );
-    let items = targetActor.data.items.filter(
+    let items = targetActor.items.filter(
       (i) =>
         i.name === "Platinum Pieces" ||
         i.name === "Gold Pieces" ||
@@ -478,8 +478,8 @@ async function importCharacter(targetActor, jsonBuild) {
   });
 
   if (
-    targetActor.data.data.details.background == null ||
-    targetActor.data.data.details.background.value != jsonBuild.background
+    targetActor.background == null ||
+    targetActor.background.value != jsonBuild.background
   ) {
     /* if (deleteAll) {
       if (fbpiDebug)
@@ -488,7 +488,7 @@ async function importCharacter(targetActor, jsonBuild) {
           pbcolor1,
           pbcolor4
         );
-      const items = targetActor.data.items.filter(
+      const items = targetActor.items.filter(
         (i) => i.type === "background"
       );
       const deletions = items.map((i) => i.id);
@@ -512,11 +512,11 @@ async function importCharacter(targetActor, jsonBuild) {
         .get("pf2e.backgrounds")
         .getDocuments();
       for (const item of packBackground) {
-        if (item.data.data.slug == getSlug(jsonBuild.background) || item.data.data.slug == getSlugNoQuote(jsonBuild.background)) {
-          allItems.push(item.data);
-          for (const backgroundFeat in item.data.data.items) {
+        if (item.slug == getSlug(jsonBuild.background) || item.slug == getSlugNoQuote(jsonBuild.background)) {
+          allItems.push(item);
+          for (const backgroundFeat in item.system.items) {
             let newFeat = [
-              item.data.data.items[backgroundFeat].name,
+              item.system.items[backgroundFeat].name,
               null,
               "Background Feat",
               1,
@@ -530,30 +530,30 @@ async function importCharacter(targetActor, jsonBuild) {
   }
   let classFeatures = [];
   // //class
-  if (targetActor.data.data.details.class != jsonBuild.class) {
+  if (targetActor.class != jsonBuild.class) {
     if (fbpiDebug)
       console.log(
         "%cPathbuilder2e Import | %cSetting class to: " + jsonBuild.class,
         pbcolor1,
         pbcolor4
       );
-    let packClasses = await game.packs.get("pf2e.classes").getDocuments();
+    let packClasses = await game.packs.get("pf2e.classes").getDocuments({name: jsonBuild.class});
 
     for (const item of packClasses) {
-      if (item.data.data.slug == getSlug(jsonBuild.class) || item.data.data.slug == getSlugNoQuote(jsonBuild.class)) {
-        await targetActor.createEmbeddedDocuments("Item", [item.data]);
-        // console.log(item.data.data.items);
-        for (const classFeatureItem in item.data.data.items) {
+      if (item.slug == getSlug(jsonBuild.class) || item.slug == getSlugNoQuote(jsonBuild.class)) {
+        await targetActor.createEmbeddedDocuments("Item", [item.toObject()]);
+        // console.log(item.system.items);
+        for (const classFeatureItem in item.system.items) {
           // console.log("Class feature:");
           // console.log(classFeatureItem);
           // console.log(
-          //   `jsonBuild.level ${jsonBuild.level} >= classFeatureItem.level ${item.data.data.items[classFeatureItem].level}? `
+          //   `jsonBuild.level ${jsonBuild.level} >= classFeatureItem.level ${item.system.items[classFeatureItem].level}? `
           // );
-          if (jsonBuild.level >= item.data.data.items[classFeatureItem].level) {
+          if (jsonBuild.level >= item.system.items[classFeatureItem].level) {
             let newFeature = {
-              id: item.data.data.items[classFeatureItem].id,
-              pack: item.data.data.items[classFeatureItem].pack,
-              name: item.data.data.items[classFeatureItem].name,
+              id: item.system.items[classFeatureItem].id,
+              pack: item.system.items[classFeatureItem].pack,
+              name: item.system.items[classFeatureItem].name,
             };
             classFeatures.push(newFeature);
           }
@@ -563,7 +563,7 @@ async function importCharacter(targetActor, jsonBuild) {
   }
 
   // // //ancestry
-  if (targetActor.data.data.details.ancestry != jsonBuild.ancestry) {
+  if (targetActor.ancestry != jsonBuild.ancestry) {
     /* if (deleteAll) {
       if (fbpiDebug)
         console.log(
@@ -571,7 +571,7 @@ async function importCharacter(targetActor, jsonBuild) {
           pbcolor1,
           pbcolor4
         );
-      const items = targetActor.data.items.filter((i) => i.type === "ancestry");
+      const items = targetActor.items.filter((i) => i.type === "ancestry");
       const deletions = items.map((i) => i.id);
       const updated = await targetActor.deleteEmbeddedDocuments(
         "Item",
@@ -580,8 +580,8 @@ async function importCharacter(targetActor, jsonBuild) {
     } */
     let packAncestry = await game.packs.get("pf2e.ancestries").getDocuments();
     for (const item of packAncestry) {
-      if (item.data.data.slug == getSlug(jsonBuild.ancestry) || item.data.data.slug == getSlugNoQuote(jsonBuild.ancestry)) {
-        allItems.push(item.data);
+      if (item.slug == getSlug(jsonBuild.ancestry) || item.slug == getSlugNoQuote(jsonBuild.ancestry)) {
+        allItems.push(item);
       }
     }
   }
@@ -835,14 +835,14 @@ async function importCharacter(targetActor, jsonBuild) {
           var itemName = arrayEquipment[ref][0];
           // console.log(itemName)
           if (
-            isNameMatch(itemName, action.data.data.slug) &&
+            isNameMatch(itemName, action.slug) &&
             needsNewInstanceofItem(targetActor, arrayEquipment[ref][0])
           ) {
             var itemAmount = arrayEquipment[ref][1];
             arrayEquipment[ref].added = true;
-            const clonedData = JSON.parse(JSON.stringify(action.data));
+            const clonedData = JSON.parse(JSON.stringify(action));
             if (clonedData.type != "kit") {
-              clonedData.data.quantity.value = itemAmount;
+              clonedData.system.quantity = itemAmount;
               allItems.push(clonedData);
             }
           }
@@ -853,13 +853,13 @@ async function importCharacter(targetActor, jsonBuild) {
         if (arrayKit.hasOwnProperty(ref)) {
           var itemSlug = arrayKit[ref][0];
           if (
-            itemSlug === action.data.data.slug &&
+            itemSlug === action.slug &&
             needsNewInstanceofItem(targetActor, itemName)
           ) {
             var itemAmount = arrayKit[ref][1];
-            const clonedData = JSON.parse(JSON.stringify(action.data));
-            clonedData.data.quantity.value = itemAmount;
-            clonedData.data.containerId.value = backpackInstance.id;
+            const clonedData = JSON.parse(JSON.stringify(action));
+            clonedData.system.quantity = itemAmount;
+            clonedData.containerId.value = backpackInstance.id;
             allItems.push(clonedData);
           }
         }
@@ -870,51 +870,51 @@ async function importCharacter(targetActor, jsonBuild) {
           var weaponDetails = arrayWeapons[ref];
           // console.log(weaponDetails.name);
           if (
-            isNameMatch(weaponDetails.name, action.data.data.slug) &&
+            isNameMatch(weaponDetails.name, action.slug) &&
             needsNewInstanceofItem(targetActor, weaponDetails.name)
           ) {
             weaponDetails.added = true;
-            const clonedData = JSON.parse(JSON.stringify(action.data));
-            clonedData.data.quantity.value = weaponDetails.qty;
+            const clonedData = JSON.parse(JSON.stringify(action));
+            clonedData.system.quantity = weaponDetails.qty;
 
             // if (specificTrained.includes(weaponDetails.name)){
-            //   clonedData.data.weaponType.value = specificTrainedInstance.id;
+            //   clonedData.weaponType.value = specificTrainedInstance.id;
             // } else if (specificExpert.includes(weaponDetails.name)){
-            //   clonedData.data.weaponType.value = specificExpertInstance.id;
+            //   clonedData.weaponType.value = specificExpertInstance.id;
             // } else if (specificMaster.includes(weaponDetails.name)){
-            //   clonedData.data.weaponType.value = specificMasterInstance.id;
+            //   clonedData.weaponType.value = specificMasterInstance.id;
             // } else if (specificLegendary.includes(weaponDetails.name)){
-            //   clonedData.data.weaponType.value = specificLegendaryInstance.id;
+            //   clonedData.weaponType.value = specificLegendaryInstance.id;
             // } else {
-            //   clonedData.data.weaponType.value = weaponDetails.prof;
+            //   clonedData.weaponType.value = weaponDetails.prof;
             // }
-            clonedData.data.damage.die = weaponDetails.die;
-            clonedData.data.potencyRune.value = weaponDetails.pot;
-            clonedData.data.strikingRune.value = weaponDetails.str;
+            clonedData.system.damage.die = weaponDetails.die;
+            clonedData.system.potencyRune.value = weaponDetails.pot;
+            clonedData.system.strikingRune.value = weaponDetails.str;
             if (weaponDetails.runes[0]) {
-              clonedData.data.propertyRune1.value = camelCase(
+              clonedData.system.propertyRune1.value = camelCase(
                 weaponDetails.runes[0]
               );
             }
             if (weaponDetails.runes[1]) {
-              clonedData.data.propertyRune2.value = camelCase(
+              clonedData.system.propertyRune2.value = camelCase(
                 weaponDetails.runes[1]
               );
             }
             if (weaponDetails.runes[2]) {
-              clonedData.data.propertyRune3.value = camelCase(
+              clonedData.system.propertyRune3.value = camelCase(
                 weaponDetails.runes[2]
               );
             }
             if (weaponDetails.runes[3]) {
-              clonedData.data.propertyRune4.value = camelCase(
+              clonedData.system.propertyRune4.value = camelCase(
                 weaponDetails.runes[3]
               );
             }
             if (weaponDetails.mat) {
               let material = weaponDetails.mat.split(" (")[0];
-              clonedData.data.preciousMaterial.value = camelCase(material);
-              clonedData.data.preciousMaterialGrade.value = getMaterialGrade(
+              clonedData.system.preciousMaterial.value = camelCase(material);
+              clonedData.system.preciousMaterialGrade.value = getMaterialGrade(
                 weaponDetails.mat
               );
             }
@@ -937,46 +937,46 @@ async function importCharacter(targetActor, jsonBuild) {
               pbcolor4
             );
           if (
-            isNameMatch(armorDetails.name, action.data.data.slug) &&
+            isNameMatch(armorDetails.name, action.slug) &&
             needsNewInstanceofItem(targetActor, armorDetails.name)
           ) {
             armorDetails.added = true;
-            const clonedData = JSON.parse(JSON.stringify(action.data));
+            const clonedData = JSON.parse(JSON.stringify(action));
             if (notBracersOfArmor(armorDetails.name)) {
-              clonedData.data.quantity.value = armorDetails.qty;
-              clonedData.data.category = armorDetails.prof;
-              clonedData.data.potencyRune.value = armorDetails.pot;
-              clonedData.data.resiliencyRune.value = armorDetails.res;
+              clonedData.system.quantity = armorDetails.qty;
+              clonedData.category = armorDetails.prof;
+              clonedData.system.potencyRune.value = armorDetails.pot;
+              clonedData.system.resiliencyRune.value = armorDetails.res;
               // this will also catch the nulls from early json data which did not have this value
               if (armorDetails.worn) {
-                clonedData.data.equipped.value = true;
+                clonedData.system.equipped.value = true;
               } else {
-                clonedData.data.equipped.value = false;
+                clonedData.system.equipped.value = false;
               }
               if (armorDetails.runes[0]) {
-                clonedData.data.propertyRune1.value = camelCase(
+                clonedData.system.propertyRune1.value = camelCase(
                   armorDetails.runes[0]
                 );
               }
               if (armorDetails.runes[1]) {
-                clonedData.data.propertyRune2.value = camelCase(
+                clonedData.system.propertyRune2.value = camelCase(
                   armorDetails.runes[1]
                 );
               }
               if (armorDetails.runes[2]) {
-                clonedData.data.propertyRune3.value = camelCase(
+                clonedData.system.propertyRune3.value = camelCase(
                   armorDetails.runes[2]
                 );
               }
               if (armorDetails.runes[3]) {
-                clonedData.data.propertyRune4.value = camelCase(
+                clonedData.system.propertyRune4.value = camelCase(
                   armorDetails.runes[3]
                 );
               }
               if (armorDetails.mat) {
                 let material = armorDetails.mat.split(" (")[0];
-                clonedData.data.preciousMaterial.value = camelCase(material);
-                clonedData.data.preciousMaterialGrade.value = getMaterialGrade(
+                clonedData.system.preciousMaterial.value = camelCase(material);
+                clonedData.system.preciousMaterialGrade.value = getMaterialGrade(
                   armorDetails.mat
                 );
               }
@@ -989,21 +989,21 @@ async function importCharacter(targetActor, jsonBuild) {
         }
       }
       if (addMoney) {
-        if (action.data.data.slug === "platinum-pieces") {
-          const clonedData = JSON.parse(JSON.stringify(action.data));
-          clonedData.data.quantity.value = jsonBuild.money.pp;
+        if (action.slug === "platinum-pieces") {
+          const clonedData = JSON.parse(JSON.stringify(action));
+          clonedData.system.quantity = jsonBuild.money.pp;
           allItems.push(clonedData);
-        } else if (action.data.data.slug === "gold-pieces") {
-          const clonedData = JSON.parse(JSON.stringify(action.data));
-          clonedData.data.quantity.value = jsonBuild.money.gp;
+        } else if (action.slug === "gold-pieces") {
+          const clonedData = JSON.parse(JSON.stringify(action));
+          clonedData.system.quantity = jsonBuild.money.gp;
           allItems.push(clonedData);
-        } else if (action.data.data.slug === "silver-pieces") {
-          const clonedData = JSON.parse(JSON.stringify(action.data));
-          clonedData.data.quantity.value = jsonBuild.money.sp;
+        } else if (action.slug === "silver-pieces") {
+          const clonedData = JSON.parse(JSON.stringify(action));
+          clonedData.system.quantity = jsonBuild.money.sp;
           allItems.push(clonedData);
-        } else if (action.data.data.slug === "copper-pieces") {
-          const clonedData = JSON.parse(JSON.stringify(action.data));
-          clonedData.data.quantity.value = jsonBuild.money.cp;
+        } else if (action.slug === "copper-pieces") {
+          const clonedData = JSON.parse(JSON.stringify(action));
+          clonedData.system.quantity = jsonBuild.money.cp;
           allItems.push(clonedData);
         }
       }
@@ -1024,28 +1024,28 @@ async function importCharacter(targetActor, jsonBuild) {
 }
 
 // function getExistingClassSlug(targetActor){
-//   for (const item of targetActor.data.items) {
-//     console.log(item.data.type);
-//     if (item.data.type =="class"){
-//       return item.data.slug;
+//   for (const item of targetActor.items) {
+//     console.log(item.type);
+//     if (item.type =="class"){
+//       return item.slug;
 //     }
 //   }
-//   // for (var ref in targetActor.data.items) {
-//   //   if (targetActor.data.items.hasOwnProperty(ref)) {
-//   //     let item =targetActor.data.items[ref];
+//   // for (var ref in targetActor.items) {
+//   //   if (targetActor.items.hasOwnProperty(ref)) {
+//   //     let item =targetActor.items[ref];
 //   //     if (item.type =="class"){
-//   //       return item.data.slug;
+//   //       return item.slug;
 //   //     }
 //   //   }
 //   // }
 //   return null;
 // }
 function getExistingAncestrySlug(targetActor) {
-  for (var ref in targetActor.data.items) {
-    if (targetActor.data.items.hasOwnProperty(ref)) {
-      let item = targetActor.data.items[ref];
+  for (var ref in targetActor.items) {
+    if (targetActor.items.hasOwnProperty(ref)) {
+      let item = targetActor.items[ref];
       if (item.type == "ancestry") {
-        return item.data.slug;
+        return item.slug;
       }
     }
   }
@@ -1107,7 +1107,7 @@ async function addFeatItems(targetActor, arrayFeats) {
         var itemName = pathbuilderFeatItem[0];
         var itemExtra = pathbuilderFeatItem[1];
         if (
-          isNameMatch(itemName, action.data.data.slug) &&
+          isNameMatch(itemName, action.slug) &&
           needsNewInstanceofFeat(targetActor, itemName, itemExtra)
         ) {
           var displayName = itemName;
@@ -1115,7 +1115,7 @@ async function addFeatItems(targetActor, arrayFeats) {
           if (itemExtra != null) {
             displayName += " (" + itemExtra + ")";
           }
-          const clonedData = JSON.parse(JSON.stringify(action.data));
+          const clonedData = JSON.parse(JSON.stringify(action));
           clonedData.name = displayName;
 
           try {
@@ -1125,7 +1125,7 @@ async function addFeatItems(targetActor, arrayFeats) {
                 pathbuilderFeatItem[3]
               );
               if (!usedLocations.includes(location)) {
-                clonedData.data.location = location;
+                clonedData.location = location;
                 usedLocations.push(location);
               }
             }
@@ -1148,7 +1148,7 @@ async function addFeatItems(targetActor, arrayFeats) {
         var itemName = pathbuilderFeatItem[0];
         var itemExtra = pathbuilderFeatItem[1];
         if (
-          isNameMatch(itemName, action.data.data.slug) &&
+          isNameMatch(itemName, action.slug) &&
           needsNewInstanceofFeat(targetActor, itemName, itemExtra)
         ) {
           var displayName = itemName;
@@ -1156,7 +1156,7 @@ async function addFeatItems(targetActor, arrayFeats) {
           if (itemExtra != null) {
             displayName += " (" + itemExtra + ")";
           }
-          const clonedData = JSON.parse(JSON.stringify(action.data));
+          const clonedData = JSON.parse(JSON.stringify(action));
           clonedData.name = displayName;
 
           try {
@@ -1166,7 +1166,7 @@ async function addFeatItems(targetActor, arrayFeats) {
                 pathbuilderFeatItem[3]
               );
               if (!usedLocations.includes(location)) {
-                clonedData.data.location = location;
+                clonedData.location = location;
                 usedLocations.push(location);
               }
             }
@@ -1213,11 +1213,11 @@ async function addActionItems(targetActor, arraySpecials) {
       if (arraySpecials.hasOwnProperty(ref)) {
         var itemName = arraySpecials[ref];
         if (
-          isNameMatch(itemName, action.data.data.slug) &&
+          isNameMatch(itemName, action.slug) &&
           needsNewInstanceofItem(targetActor, itemName)
         ) {
           addedItems.push(itemName);
-          allItems.push(action.data);
+          allItems.push(action);
         }
       }
     }
@@ -1235,11 +1235,11 @@ async function addAncestryFeatureItems(targetActor, arraySpecials) {
       if (arraySpecials.hasOwnProperty(ref)) {
         var itemName = arraySpecials[ref];
         if (
-          isNameMatch(itemName, action.data.data.slug) &&
+          isNameMatch(itemName, action.slug) &&
           needsNewInstanceofItem(targetActor, itemName)
         ) {
           addedItems.push(itemName);
-          allItems.push(action.data);
+          allItems.push(action);
         }
       }
     }
@@ -1256,13 +1256,13 @@ async function addAncestryFeatureFeatItems(targetActor, arraySpecials) {
     for (var ref in arraySpecials) {
       if (arraySpecials.hasOwnProperty(ref)) {
         var itemName = arraySpecials[ref];
-        // console.log(`is ${itemName} = ${action.data.data.slug}?`);
+        // console.log(`is ${itemName} = ${action.slug}?`);
         if (
-          isNameMatch(itemName, action.data.data.slug) &&
+          isNameMatch(itemName, action.slug) &&
           needsNewInstanceofItem(targetActor, itemName)
         ) {
           addedItems.push(itemName);
-          allItems.push(action.data);
+          allItems.push(action);
         }
       }
     }
@@ -1280,11 +1280,11 @@ async function addClassFeatureItems(targetActor, arraySpecials, arrayCF) {
       if (arraySpecials.hasOwnProperty(ref)) {
         var itemName = arraySpecials[ref];
         if (
-          isNameMatch(itemName, action.data.data.slug) &&
+          isNameMatch(itemName, action.slug) &&
           needsNewInstanceofItem(targetActor, itemName)
         ) {
           addedItems.push(itemName);
-          allItems.push(action.data);
+          allItems.push(action);
         }
       }
     }
@@ -1297,11 +1297,11 @@ async function addClassFeatureItems(targetActor, arraySpecials, arrayCF) {
     for (var ref in classFeatures) {
       var itemName = classFeatures[ref];
       if (
-        isNameMatch(itemName, action.data.data.slug) &&
+        isNameMatch(itemName, action.slug) &&
         needsNewInstanceofItem(targetActor, itemName)
       ) {
         addedItems.push(itemName);
-        allItems.push(action.data);
+        allItems.push(action);
       }
     }
   }
@@ -1333,26 +1333,26 @@ function isSpecialsPack(packName) {
 function featIsRequired(item, arrayFeats) {
   for (var featDetails in arrayFeats) {
     if (arrayFeats.hasOwnProperty(featDetails)) {
-      if (getSlug(arrayFeats[featDetails][0]) == item.data.data.slug)
+      if (getSlug(arrayFeats[featDetails][0]) == item.slug)
         return true;
-      if (getSlugNoQuote(arrayFeats[featDetails][0]) == item.data.data.slug)
+      if (getSlugNoQuote(arrayFeats[featDetails][0]) == item.slug)
         return true;
       if (
         getSlug(
           getClassAdjustedSpecialNameLowerCase(arrayFeats[featDetails][0])
-        ) == item.data.data.slug
+        ) == item.slug
       )
         return true;
       if (
         getSlug(
           getAncestryAdjustedSpecialNameLowerCase(arrayFeats[featDetails][0])
-        ) == item.data.data.slug
+        ) == item.slug
       )
         return true;
       if (
         getSlug(
           getHeritageAdjustedSpecialNameLowerCase(arrayFeats[featDetails][0])
-        ) == item.data.data.slug
+        ) == item.slug
       )
         return true;
     }
@@ -1362,23 +1362,23 @@ function featIsRequired(item, arrayFeats) {
 function specialIsRequired(item, arraySpecials) {
   for (var ref in arraySpecials) {
     if (arraySpecials.hasOwnProperty(ref)) {
-      if (getSlug(arraySpecials[ref]) == item.data.data.slug || getSlugNoQuote(arraySpecials[ref]) == item.data.data.slug) return true;
+      if (getSlug(arraySpecials[ref]) == item.slug || getSlugNoQuote(arraySpecials[ref]) == item.slug) return true;
       if (
         getSlug(getClassAdjustedSpecialNameLowerCase(arraySpecials[ref])) ==
-        item.data.data.slug || getSlugNoQuote(getClassAdjustedSpecialNameLowerCase(arraySpecials[ref])) ==
-        item.data.data.slug
+        item.slug || getSlugNoQuote(getClassAdjustedSpecialNameLowerCase(arraySpecials[ref])) ==
+        item.slug
       )
         return true;
       if (
         getSlug(getAncestryAdjustedSpecialNameLowerCase(arraySpecials[ref])) ==
-        item.data.data.slug || getSlugNoQuote(getAncestryAdjustedSpecialNameLowerCase(arraySpecials[ref])) ==
-        item.data.data.slug
+        item.slug || getSlugNoQuote(getAncestryAdjustedSpecialNameLowerCase(arraySpecials[ref])) ==
+        item.slug
       )
         return true;
       if (
         getSlug(getHeritageAdjustedSpecialNameLowerCase(arraySpecials[ref])) ==
-        item.data.data.slug || getSlugNoQuote(getHeritageAdjustedSpecialNameLowerCase(arraySpecials[ref])) ==
-        item.data.data.slug
+        item.slug || getSlugNoQuote(getHeritageAdjustedSpecialNameLowerCase(arraySpecials[ref])) ==
+        item.slug
       )
         return true;
     }
@@ -1395,37 +1395,37 @@ function equipmentIsRequired(
 ) {
   for (var ref in arrayEquipment) {
     if (arrayEquipment.hasOwnProperty(ref)) {
-      if (getSlug(arrayEquipment[ref][0]) === item.data.data.slug) return true;
-      if (getSlugNoQuote(arrayEquipment[ref][0]) === item.data.data.slug)
+      if (getSlug(arrayEquipment[ref][0]) === item.slug) return true;
+      if (getSlugNoQuote(arrayEquipment[ref][0]) === item.slug)
         return true;
     }
   }
   for (var ref in arrayWeapons) {
     if (arrayWeapons.hasOwnProperty(ref)) {
-      if (getSlug(arrayWeapons[ref].name) === item.data.data.slug) return true;
-      if (getSlugNoQuote(arrayWeapons[ref].name) === item.data.data.slug)
+      if (getSlug(arrayWeapons[ref].name) === item.slug) return true;
+      if (getSlugNoQuote(arrayWeapons[ref].name) === item.slug)
         return true;
     }
   }
   for (var ref in arrayArmor) {
     if (arrayArmor.hasOwnProperty(ref)) {
       arrayArmor[ref].name=mapItemToFoundryName(arrayArmor[ref].name);
-      if (getSlug(arrayArmor[ref].name) === item.data.data.slug) return true;
-      if (getSlugNoQuote(arrayArmor[ref].name) === item.data.data.slug)
+      if (getSlug(arrayArmor[ref].name) === item.slug) return true;
+      if (getSlugNoQuote(arrayArmor[ref].name) === item.slug)
         return true;
     }
   }
   for (var ref in arrayKit) {
     if (arrayKit.hasOwnProperty(ref)) {
-      if (arrayKit[ref][0] === item.data.data.slug) return true;
+      if (arrayKit[ref][0] === item.slug) return true;
     }
   }
   if (
     addMoney &&
-    (item.data.data.slug === "platinum-pieces" ||
-      item.data.data.slug === "gold-pieces" ||
-      item.data.data.slug === "silver-pieces" ||
-      item.data.data.slug === "copper-pieces")
+    (item.slug === "platinum-pieces" ||
+      item.slug === "gold-pieces" ||
+      item.slug === "silver-pieces" ||
+      item.slug === "copper-pieces")
   ) {
     return true;
   }
@@ -1448,17 +1448,17 @@ function getHeritageAdjustedSpecialNameLowerCase(specialName) {
 }
 
 function needsNewInstanceofFeat(targetActor, itemName, itemExtra) {
-  for (const existingItem of targetActor.data.items) {
+  for (const existingItem of targetActor.items) {
     var displayName = itemName;
     if (itemExtra != null) displayName += " (" + itemExtra + ")";
-    if (existingItem.data.name === displayName) return false;
+    if (existingItem.name === displayName) return false;
   }
   return true;
 }
 function needsNewInstanceofItem(targetActor, itemName) {
-  for (var ref in targetActor.data.items) {
-    if (targetActor.data.items.hasOwnProperty(ref)) {
-      if (targetActor.data.items[ref].name === itemName) return false;
+  for (var ref in targetActor.items) {
+    if (targetActor.items.hasOwnProperty(ref)) {
+      if (targetActor.items[ref].name === itemName) return false;
     }
   }
   return true;
@@ -1485,10 +1485,10 @@ async function setSpellcasters(targetActor, arraySpellcasters) {
       pbcolor1,
       pbcolor4
     );
-  let items = targetActor.data.items.filter((i) => i.type === "spell");
+  let items = targetActor.items.filter((i) => i.type === "spell");
   let deletions = items.map((i) => i.id);
   let updated = await targetActor.deleteEmbeddedDocuments("Item", deletions);
-  items = targetActor.data.items.filter((i) => i.type === "spellcastingEntry");
+  items = targetActor.items.filter((i) => i.type === "spellcastingEntry");
   deletions = items.map((i) => i.id);
   updated = await targetActor.deleteEmbeddedDocuments("Item", deletions);
   // make array of spellcaster instances. put
@@ -1540,7 +1540,7 @@ async function setSpellcasters(targetActor, arraySpellcasters) {
               for (var ref in spellListObject.list) {
                 if (spellListObject.list.hasOwnProperty(ref)) {
                   if (
-                    getSlug(spellListObject.list[ref]) == action.data.data.slug || getSlugNoQuote(spellListObject.list[ref]) == action.data.data.slug
+                    getSlug(spellListObject.list[ref]) == action.slug || getSlugNoQuote(spellListObject.list[ref]) == action.slug
                   ) {
                     const clonedData = JSON.parse(JSON.stringify(action.data));
                     clonedData.data.location.value = spellCaster.instance[0].id;
@@ -1565,7 +1565,7 @@ async function setSpellcasters(targetActor, arraySpellcasters) {
 function spellIsRequired(item, arraySpells) {
   for (var ref in arraySpells) {
     if (arraySpells.hasOwnProperty(ref)) {
-      if (getSlug(arraySpells[ref]) == item.data.data.slug) return true;
+      if (getSlug(arraySpells[ref]) == item.slug) return true;
     }
   }
   return false;
@@ -1694,11 +1694,11 @@ async function addLores(targetActor, arrayLores) {
         };
         arrayLoreData.push(data);
       } else {
-        for (var ref in targetActor.data.items) {
-          if (targetActor.data.items.hasOwnProperty(ref)) {
-            if (targetActor.data.items[ref].name === loreName) {
+        for (var ref in targetActor.items) {
+          if (targetActor.items.hasOwnProperty(ref)) {
+            if (targetActor.items[ref].name === loreName) {
               const update = {
-                id: targetActor.data.items[ref].id,
+                id: targetActor.items[ref].id,
                 "data.proficient.value": loreProf / 2,
               };
               targetActor.updateEmbeddedEntity("Item", update); // Updates one EmbeddedEntity
@@ -1714,15 +1714,15 @@ async function addLores(targetActor, arrayLores) {
 }
 
 function needsNewInstanceOfLore(targetActor, loreName) {
-  for (var ref in targetActor.data.items) {
-    if (targetActor.data.items.hasOwnProperty(ref)) {
-      if (targetActor.data.items[ref].name === loreName) return false;
+  for (var ref in targetActor.items) {
+    if (targetActor.items.hasOwnProperty(ref)) {
+      if (targetActor.items[ref].name === loreName) return false;
     }
   }
   return true;
 }
 
-function checkAllFinishedAndCreate(targetActor) {
+async function checkAllFinishedAndCreate(targetActor) {
   if (
     finishedFeats &&
     finishedEquipment &&
@@ -1731,12 +1731,12 @@ function checkAllFinishedAndCreate(targetActor) {
     finishedAncestryFeatures &&
     finishedClassFeatures
   ) {
-    let finished = targetActor.createEmbeddedDocuments("Item", allItems);
+    let finished = await targetActor.createEmbeddedDocuments("Item", allItems);
     if (finished) {
       let notAddedCount = 0;
       let warningList = "";
       let warning =
-        "<p>The following items could not be added. They may have already have been added in a previous import or cannot be matched to a foundry item. You may be able to find them with a manual search.</p><ul>";
+        "<p>The following items could not be added. They may have already been added in a previous import or cannot be matched to a foundry item. You may be able to find them with a manual search.</p><ul>";
       if (addEquipment) {
         for (var ref in jsonBuild.equipment) {
           if (jsonBuild.equipment.hasOwnProperty(ref)) {
@@ -1775,8 +1775,8 @@ function checkAllFinishedAndCreate(targetActor) {
         targetActor.update({
           "flags.exportSource.world": game.world.id,
           "flags.exportSource.system": game.system.id,
-          "flags.exportSource.systemVersion": game.system.data.version,
-          "flags.exportSource.coreVersion": game.data.version,
+          "flags.exportSource.systemVersion": game.system.version,
+          "flags.exportSource.coreVersion": game.version,
           "flags.pathbuilderID.value": buildID,
         });
         targetActor.update({"data.resources.focus.max": focusPool,"data.resources.focus.value": focusPool,})
@@ -1824,7 +1824,7 @@ function checkAllFinishedAndCreate(targetActor) {
           default: "yes",
           close: (html) => {
             if (heroVaultExport) {
-              let heroJSON = JSON.stringify(targetActor.data);
+              let heroJSON = JSON.stringify(targetActor);
               if (fbpiDebug) console.log(heroJSON);
               doHVExport(heroJSON, targetActor);
             }
@@ -1833,7 +1833,7 @@ function checkAllFinishedAndCreate(targetActor) {
       } else {
         ui.notifications.info("Import completed successfully.");
         if (heroVaultExport) {
-          let heroJSON = JSON.stringify(targetActor.data);
+          let heroJSON = JSON.stringify(targetActor);
           if (fbpiDebug) console.log(heroJSON);
           doHVExport(heroJSON, targetActor);
         }
@@ -1843,8 +1843,8 @@ function checkAllFinishedAndCreate(targetActor) {
 }
 
 function reportWarnings(warnings) {
-  let systemVersion = game.system.data.version;
-  let coreVersion = game.data.version;
+  let systemVersion = game.system.version;
+  let coreVersion = game.version;
   var xmlhttp = new XMLHttpRequest();
   xmlhttp.open("POST", reportDomain + "/pbreport.php", true);
   xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
