@@ -1125,7 +1125,7 @@ async function addFeatItems(targetActor, arrayFeats) {
                 pathbuilderFeatItem[3]
               );
               if (!usedLocations.includes(location)) {
-                clonedData.location = location;
+                clonedData.system.location = location;
                 usedLocations.push(location);
               }
             }
@@ -1165,7 +1165,7 @@ async function addFeatItems(targetActor, arrayFeats) {
                 pathbuilderFeatItem[3]
               );
               if (!usedLocations.includes(location)) {
-                clonedData.location = location;
+                clonedData.system.location = location;
                 usedLocations.push(location);
               }
             }
