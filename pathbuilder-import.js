@@ -513,7 +513,7 @@ async function importCharacter(targetActor, jsonBuild) {
         .getDocuments();
       for (const item of packBackground) {
         if (item.slug == getSlug(jsonBuild.background) || item.slug == getSlugNoQuote(jsonBuild.background)) {
-          allItems.push(item);
+          allItems.push(item.toObject());
           for (const backgroundFeat in item.system.items) {
             let newFeat = [
               item.system.items[backgroundFeat].name,
@@ -581,7 +581,7 @@ async function importCharacter(targetActor, jsonBuild) {
     let packAncestry = await game.packs.get("pf2e.ancestries").getDocuments();
     for (const item of packAncestry) {
       if (item.slug == getSlug(jsonBuild.ancestry) || item.slug == getSlugNoQuote(jsonBuild.ancestry)) {
-        allItems.push(item);
+        allItems.push(item.toObject());
       }
     }
   }
@@ -840,7 +840,7 @@ async function importCharacter(targetActor, jsonBuild) {
           ) {
             var itemAmount = arrayEquipment[ref][1];
             arrayEquipment[ref].added = true;
-            const clonedData = JSON.parse(JSON.stringify(action));
+            const clonedData = action.clone().toObject();
             if (clonedData.type != "kit") {
               clonedData.system.quantity = itemAmount;
               allItems.push(clonedData);
@@ -857,7 +857,7 @@ async function importCharacter(targetActor, jsonBuild) {
             needsNewInstanceofItem(targetActor, itemName)
           ) {
             var itemAmount = arrayKit[ref][1];
-            const clonedData = JSON.parse(JSON.stringify(action));
+            const clonedData = action.clone().toObject();
             clonedData.system.quantity = itemAmount;
             clonedData.containerId.value = backpackInstance.id;
             allItems.push(clonedData);
@@ -874,7 +874,7 @@ async function importCharacter(targetActor, jsonBuild) {
             needsNewInstanceofItem(targetActor, weaponDetails.name)
           ) {
             weaponDetails.added = true;
-            const clonedData = JSON.parse(JSON.stringify(action));
+            const clonedData = action.clone().toObject();
             clonedData.system.quantity = weaponDetails.qty;
 
             // if (specificTrained.includes(weaponDetails.name)){
@@ -941,10 +941,10 @@ async function importCharacter(targetActor, jsonBuild) {
             needsNewInstanceofItem(targetActor, armorDetails.name)
           ) {
             armorDetails.added = true;
-            const clonedData = JSON.parse(JSON.stringify(action));
+            const clonedData = action.clone().toObject();
             if (notBracersOfArmor(armorDetails.name)) {
               clonedData.system.quantity = armorDetails.qty;
-              clonedData.category = armorDetails.prof;
+              clonedData.system.category = armorDetails.prof;
               clonedData.system.potencyRune.value = armorDetails.pot;
               clonedData.system.resiliencyRune.value = armorDetails.res;
               // this will also catch the nulls from early json data which did not have this value
@@ -1115,7 +1115,7 @@ async function addFeatItems(targetActor, arrayFeats) {
           if (itemExtra != null) {
             displayName += " (" + itemExtra + ")";
           }
-          const clonedData = JSON.parse(JSON.stringify(action));
+          const clonedData = action.toObject();
           clonedData.name = displayName;
 
           try {
@@ -1132,7 +1132,6 @@ async function addFeatItems(targetActor, arrayFeats) {
           } catch (err) {
             console.log(err);
           }
-          clonedData._id=makeid(16);
           allItems.push(clonedData);
         }
       }
@@ -1156,7 +1155,7 @@ async function addFeatItems(targetActor, arrayFeats) {
           if (itemExtra != null) {
             displayName += " (" + itemExtra + ")";
           }
-          const clonedData = JSON.parse(JSON.stringify(action));
+          const clonedData = action.clone().toObject();
           clonedData.name = displayName;
 
           try {
@@ -1217,7 +1216,7 @@ async function addActionItems(targetActor, arraySpecials) {
           needsNewInstanceofItem(targetActor, itemName)
         ) {
           addedItems.push(itemName);
-          allItems.push(action);
+          allItems.push(action.toObject());
         }
       }
     }
@@ -1239,7 +1238,7 @@ async function addAncestryFeatureItems(targetActor, arraySpecials) {
           needsNewInstanceofItem(targetActor, itemName)
         ) {
           addedItems.push(itemName);
-          allItems.push(action);
+          allItems.push(action.toObject());
         }
       }
     }
@@ -1262,7 +1261,7 @@ async function addAncestryFeatureFeatItems(targetActor, arraySpecials) {
           needsNewInstanceofItem(targetActor, itemName)
         ) {
           addedItems.push(itemName);
-          allItems.push(action);
+          allItems.push(action.clone().toObject());
         }
       }
     }
@@ -1284,7 +1283,7 @@ async function addClassFeatureItems(targetActor, arraySpecials, arrayCF) {
           needsNewInstanceofItem(targetActor, itemName)
         ) {
           addedItems.push(itemName);
-          allItems.push(action);
+          allItems.push(action.toObject());
         }
       }
     }
@@ -1301,7 +1300,7 @@ async function addClassFeatureItems(targetActor, arraySpecials, arrayCF) {
         needsNewInstanceofItem(targetActor, itemName)
       ) {
         addedItems.push(itemName);
-        allItems.push(action);
+        allItems.push(action.clone().toObject());
       }
     }
   }
