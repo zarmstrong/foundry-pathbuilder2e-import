@@ -1155,7 +1155,7 @@ async function addFeatItems(targetActor, arrayFeats) {
           if (itemExtra != null) {
             displayName += " (" + itemExtra + ")";
           }
-          const clonedData = action.clone().toObject();
+          const clonedData = action.toObject();
           clonedData.name = displayName;
 
           try {
@@ -1300,7 +1300,7 @@ async function addClassFeatureItems(targetActor, arraySpecials, arrayCF) {
         needsNewInstanceofItem(targetActor, itemName)
       ) {
         addedItems.push(itemName);
-        allItems.push(action.clone().toObject());
+        allItems.push(action.toObject());
       }
     }
   }
