@@ -766,6 +766,8 @@ async function importCharacter(targetActor, jsonBuild) {
         "Item",
         backpackData
       );
+      console.log("backpackInstance: "+backpackInstance)
+      console.log(backpackInstance)
       arrayKit.push(["bedroll", 1]);
       arrayKit.push(["chalk", 10]);
       arrayKit.push(["flint-and-steel", 1]);
@@ -859,7 +861,8 @@ async function importCharacter(targetActor, jsonBuild) {
             var itemAmount = arrayKit[ref][1];
             const clonedData = action.clone().toObject();
             clonedData.system.quantity = itemAmount;
-            clonedData.containerId.value = backpackInstance.id;
+            if (backpackInstance?.id)
+              clonedData.containerId.value = backpackInstance.id;
             allItems.push(clonedData);
           }
         }
