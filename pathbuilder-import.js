@@ -735,12 +735,7 @@ async function importCharacter(targetActor, jsonBuild) {
     // console.log("%cPathbuilder2e Import | %cdoing action items",pbcolor1,pbcolor4)
     await addActionItems(targetActor, arraySpecials);
     await addAncestryFeatureItems(targetActor, arraySpecials);
-    await addClassFeatureItems(targetActor, arraySpecials, classFeatures);
-    await addClassFeatureItems(
-      targetActor,
-      specialClassFeatures,
-      classFeatures
-    );
+    await addClassFeatureItems(targetActor, arraySpecials, specialClassFeatures, classFeatures);
   } else {
     finishedFeats = true;
     finishedAncestryFeatures = true;
@@ -1278,7 +1273,7 @@ async function addAncestryFeatureFeatItems(targetActor, arraySpecials) {
   checkAllFinishedAndCreate(targetActor);
 }
 
-async function addClassFeatureItems(targetActor, arraySpecials, arrayCF) {
+async function addClassFeatureItems(targetActor, arraySpecials, specialClassFeatures, arrayCF) {
   let content = await game.packs.get("pf2e.classfeatures").getDocuments();
   for (const action of content.filter((item) =>
     specialIsRequired(item, arraySpecials)
@@ -1296,6 +1291,23 @@ async function addClassFeatureItems(targetActor, arraySpecials, arrayCF) {
       }
     }
   }
+
+  for (const action of content.filter((item) =>
+  specialIsRequired(item, specialClassFeatures)
+)) {
+  for (var ref in specialClassFeatures) {
+    if (specialClassFeatures.hasOwnProperty(ref)) {
+      var itemName = specialClassFeatures[ref];
+      if (
+        isNameMatch(itemName, action.slug) &&
+        needsNewInstanceofItem(targetActor, itemName)
+      ) {
+        addedItems.push(itemName);
+        allItems.push(action.toObject());
+      }
+    }
+  }
+}
 
   let classFeatures = arrayCF.map((a) => a.name);
   for (const action of content.filter((item) =>
