@@ -421,12 +421,11 @@ async function importCharacter(targetActor, jsonBuild) {
     jsonBuild.attributes.classhp * jsonBuild.level +
     jsonBuild.attributes.ancestryhp +
     conBonus * jsonBuild.level;
-
+  
   await targetActor.update({
     name: jsonBuild.name,
     "token.name": jsonBuild.name,
     "data.details.level.value": jsonBuild.level,
-    "data.details.heritage.value": jsonBuild.heritage,
     "data.details.age.value": jsonBuild.age,
     "data.details.gender.value": jsonBuild.gender,
     "data.details.alignment.value": jsonBuild.alignment,
@@ -586,9 +585,17 @@ async function importCharacter(targetActor, jsonBuild) {
     }
   }
 
+  if (targetActor.heritage !== jsonBuild.heritage) {
+    let heritage = await game.packs.get('pf2e.heritages')?.getDocuments({name: jsonBuild.heritage})
+    if (heritage?.length) heritage = heritage[0]
+    if (heritage) { 
+      allItems.push(heritage.toObject())
+      addedItems.push(jsonBuild.heritage)
+    }
+  }
+
   //clean up some specials that are handled by Foundry:
   let blacklist = [
-    jsonBuild.heritage,
     "Great Fortitude",
     "Divine Spellcasting",
     "Divine Ally (Blade)",
