@@ -2,7 +2,9 @@
   "name": "pathbuilder2e-import",
   "title": "Pathbuilder 2e Import",
   "description": "This module allows players and GMs to import player characters built in Pathbuilder 2e.",
-  "authors": "slate",
+  "authors": [
+    {"name" : "slate"}, {"name" : "kobseryqum"}
+    ],
   "version": "0.10.0",
   "minimumCoreVersion": "10",
   "compatibleCoreVersion": "9.255",
