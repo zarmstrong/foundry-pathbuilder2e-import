@@ -757,7 +757,7 @@ async function importCharacter(targetActor, jsonBuild) {
     let pack = game.packs.get("pf2e.equipment-srd");
     let content = await game.packs.get("pf2e.equipment-srd").getDocuments();
     let backpackData = await pack.getDocuments({name: "Backpack"});
-    let backpackInstance = [];
+    let backpackInstance = {};
 
     let arrayKit = [];
     if (hasAdventurersPack(arrayEquipment)) {
@@ -861,7 +861,7 @@ async function importCharacter(targetActor, jsonBuild) {
             var itemAmount = arrayKit[ref][1];
             const clonedData = action.clone().toObject();
             clonedData.system.quantity = itemAmount;
-            clonedData.system.containerId = backpackInstance.id;
+            clonedData.system.containerId = backpackInstance?.id;
             allItems.push(clonedData);
           }
         }
