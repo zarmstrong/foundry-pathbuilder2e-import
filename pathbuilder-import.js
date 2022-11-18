@@ -1704,7 +1704,7 @@ async function addLores(targetActor, arrayLores) {
         const data = {
           name: loreName,
           type: "lore",
-          data: loreData,
+          system: loreData,
         };
         arrayLoreData.push(data);
       } else {
