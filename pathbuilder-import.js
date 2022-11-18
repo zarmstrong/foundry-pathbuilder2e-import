@@ -767,6 +767,7 @@ async function importCharacter(targetActor, jsonBuild) {
         backpackData
       );
       backpackInstance = backpackInstance?.length ? backpackInstance[0] : backpackInstance
+
       arrayKit.push(["bedroll", 1]);
       arrayKit.push(["chalk", 10]);
       arrayKit.push(["flint-and-steel", 1]);
