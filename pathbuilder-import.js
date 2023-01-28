@@ -407,8 +407,6 @@ async function importCharacter(targetActor, jsonBuild) {
     }
   }
 
-  // 'data.details.class.value': jsonBuild.class,
-  // 'data.details.ancestry.value': jsonBuild.ancestry,
   let conEven =
     (jsonBuild.abilities.con % 2 == 0
       ? jsonBuild.abilities.con
@@ -421,60 +419,59 @@ async function importCharacter(targetActor, jsonBuild) {
     jsonBuild.attributes.classhp * jsonBuild.level +
     jsonBuild.attributes.ancestryhp +
     conBonus * jsonBuild.level;
-
+  
   await targetActor.update({
     name: jsonBuild.name,
     "token.name": jsonBuild.name,
-    "data.details.level.value": jsonBuild.level,
-    "data.details.heritage.value": jsonBuild.heritage,
-    "data.details.age.value": jsonBuild.age,
-    "data.details.gender.value": jsonBuild.gender,
-    "data.details.alignment.value": jsonBuild.alignment,
-    "data.details.keyability.value": jsonBuild.keyability,
-    "data.details.deity.value": jsonBuild.deity,
+    "system.details.level.value": jsonBuild.level,
+    "system.details.age.value": jsonBuild.age,
+    "system.details.gender.value": jsonBuild.gender,
+    "system.details.alignment.value": jsonBuild.alignment,
+    "system.details.keyability.value": jsonBuild.keyability,
+    "system.details.deity.value": jsonBuild.deity,
 
-    "data.traits.size.value": getSizeValue(jsonBuild.size),
+    "system.traits.size.value": getSizeValue(jsonBuild.size),
 
-    "data.traits.languages.value": jsonBuild.languages,
-    "data.traits.senses": senses,
-    "data.abilities.str.value": jsonBuild.abilities.str,
-    "data.abilities.dex.value": jsonBuild.abilities.dex,
-    "data.abilities.con.value": jsonBuild.abilities.con,
-    "data.abilities.int.value": jsonBuild.abilities.int,
-    "data.abilities.wis.value": jsonBuild.abilities.wis,
-    "data.abilities.cha.value": jsonBuild.abilities.cha,
+    "system.traits.languages.value": jsonBuild.languages,
+    "system.traits.senses": senses,
+    "system.abilities.str.value": jsonBuild.abilities.str,
+    "system.abilities.dex.value": jsonBuild.abilities.dex,
+    "system.abilities.con.value": jsonBuild.abilities.con,
+    "system.abilities.int.value": jsonBuild.abilities.int,
+    "system.abilities.wis.value": jsonBuild.abilities.wis,
+    "system.abilities.cha.value": jsonBuild.abilities.cha,
 
-    "data.saves.fortitude.rank": jsonBuild.proficiencies.fortitude / 2,
-    "data.saves.reflex.rank": jsonBuild.proficiencies.reflex / 2,
-    "data.saves.will.rank": jsonBuild.proficiencies.will / 2,
+    "system.saves.fortitude.rank": jsonBuild.proficiencies.fortitude / 2,
+    "system.saves.reflex.rank": jsonBuild.proficiencies.reflex / 2,
+    "system.saves.will.rank": jsonBuild.proficiencies.will / 2,
 
-    "data.martial.advanced.rank": jsonBuild.proficiencies.advanced / 2,
-    "data.martial.heavy.rank": jsonBuild.proficiencies.heavy / 2,
-    "data.martial.light.rank": jsonBuild.proficiencies.light / 2,
-    "data.martial.medium.rank": jsonBuild.proficiencies.medium / 2,
-    "data.martial.unarmored.rank": jsonBuild.proficiencies.unarmored / 2,
-    "data.martial.martial.rank": jsonBuild.proficiencies.martial / 2,
-    "data.martial.simple.rank": jsonBuild.proficiencies.simple / 2,
-    "data.martial.unarmed.rank": jsonBuild.proficiencies.unarmed / 2,
-    "data.skills.acr.rank": jsonBuild.proficiencies.acrobatics / 2,
-    "data.skills.arc.rank": jsonBuild.proficiencies.arcana / 2,
-    "data.skills.ath.rank": jsonBuild.proficiencies.athletics / 2,
-    "data.skills.cra.rank": jsonBuild.proficiencies.crafting / 2,
-    "data.skills.dec.rank": jsonBuild.proficiencies.deception / 2,
-    "data.skills.dip.rank": jsonBuild.proficiencies.diplomacy / 2,
-    "data.skills.itm.rank": jsonBuild.proficiencies.intimidation / 2,
-    "data.skills.med.rank": jsonBuild.proficiencies.medicine / 2,
-    "data.skills.nat.rank": jsonBuild.proficiencies.nature / 2,
-    "data.skills.occ.rank": jsonBuild.proficiencies.occultism / 2,
-    "data.skills.prf.rank": jsonBuild.proficiencies.performance / 2,
-    "data.skills.rel.rank": jsonBuild.proficiencies.religion / 2,
-    "data.skills.soc.rank": jsonBuild.proficiencies.society / 2,
-    "data.skills.ste.rank": jsonBuild.proficiencies.stealth / 2,
-    "data.skills.sur.rank": jsonBuild.proficiencies.survival / 2,
-    "data.skills.thi.rank": jsonBuild.proficiencies.thievery / 2,
+    "system.martial.advanced.rank": jsonBuild.proficiencies.advanced / 2,
+    "system.martial.heavy.rank": jsonBuild.proficiencies.heavy / 2,
+    "system.martial.light.rank": jsonBuild.proficiencies.light / 2,
+    "system.martial.medium.rank": jsonBuild.proficiencies.medium / 2,
+    "system.martial.unarmored.rank": jsonBuild.proficiencies.unarmored / 2,
+    "system.martial.martial.rank": jsonBuild.proficiencies.martial / 2,
+    "system.martial.simple.rank": jsonBuild.proficiencies.simple / 2,
+    "system.martial.unarmed.rank": jsonBuild.proficiencies.unarmed / 2,
+    "system.skills.acr.rank": jsonBuild.proficiencies.acrobatics / 2,
+    "system.skills.arc.rank": jsonBuild.proficiencies.arcana / 2,
+    "system.skills.ath.rank": jsonBuild.proficiencies.athletics / 2,
+    "system.skills.cra.rank": jsonBuild.proficiencies.crafting / 2,
+    "system.skills.dec.rank": jsonBuild.proficiencies.deception / 2,
+    "system.skills.dip.rank": jsonBuild.proficiencies.diplomacy / 2,
+    "system.skills.itm.rank": jsonBuild.proficiencies.intimidation / 2,
+    "system.skills.med.rank": jsonBuild.proficiencies.medicine / 2,
+    "system.skills.nat.rank": jsonBuild.proficiencies.nature / 2,
+    "system.skills.occ.rank": jsonBuild.proficiencies.occultism / 2,
+    "system.skills.prf.rank": jsonBuild.proficiencies.performance / 2,
+    "system.skills.rel.rank": jsonBuild.proficiencies.religion / 2,
+    "system.skills.soc.rank": jsonBuild.proficiencies.society / 2,
+    "system.skills.ste.rank": jsonBuild.proficiencies.stealth / 2,
+    "system.skills.sur.rank": jsonBuild.proficiencies.survival / 2,
+    "system.skills.thi.rank": jsonBuild.proficiencies.thievery / 2,
 
-    "data.attributes.perception.rank": jsonBuild.proficiencies.perception / 2,
-    "data.attributes.classDC.rank": jsonBuild.proficiencies.classDC / 2,
+    "system.attributes.perception.rank": jsonBuild.proficiencies.perception / 2,
+    "system.attributes.classDC.rank": jsonBuild.proficiencies.classDC / 2,
   });
 
   if (
@@ -586,9 +583,17 @@ async function importCharacter(targetActor, jsonBuild) {
     }
   }
 
+  if (targetActor.heritage !== jsonBuild.heritage) {
+    let heritage = await game.packs.get('pf2e.heritages')?.getDocuments({name: jsonBuild.heritage})
+    if (heritage?.length) heritage = heritage[0]
+    if (heritage) { 
+      allItems.push(heritage.toObject())
+      addedItems.push(jsonBuild.heritage)
+    }
+  }
+
   //clean up some specials that are handled by Foundry:
   let blacklist = [
-    jsonBuild.heritage,
     "Great Fortitude",
     "Divine Spellcasting",
     "Divine Ally (Blade)",
@@ -728,12 +733,7 @@ async function importCharacter(targetActor, jsonBuild) {
     // console.log("%cPathbuilder2e Import | %cdoing action items",pbcolor1,pbcolor4)
     await addActionItems(targetActor, arraySpecials);
     await addAncestryFeatureItems(targetActor, arraySpecials);
-    await addClassFeatureItems(targetActor, arraySpecials, classFeatures);
-    await addClassFeatureItems(
-      targetActor,
-      specialClassFeatures,
-      classFeatures
-    );
+    await addClassFeatureItems(targetActor, arraySpecials, specialClassFeatures, classFeatures);
   } else {
     finishedFeats = true;
     finishedAncestryFeatures = true;
@@ -756,8 +756,8 @@ async function importCharacter(targetActor, jsonBuild) {
   if (addEquipment) {
     let pack = game.packs.get("pf2e.equipment-srd");
     let content = await game.packs.get("pf2e.equipment-srd").getDocuments();
-    let backpackData = await pack.getDocuments("3lgwjrFEsQVKzhh7");
-    let backpackInstance = [];
+    let backpackData = await pack.getDocuments({name: "Backpack"});
+    let backpackInstance = {};
 
     let arrayKit = [];
     if (hasAdventurersPack(arrayEquipment)) {
@@ -766,8 +766,8 @@ async function importCharacter(targetActor, jsonBuild) {
         "Item",
         backpackData
       );
-      console.log("backpackInstance: "+backpackInstance)
-      console.log(backpackInstance)
+      backpackInstance = backpackInstance?.length ? backpackInstance[0] : backpackInstance
+
       arrayKit.push(["bedroll", 1]);
       arrayKit.push(["chalk", 10]);
       arrayKit.push(["flint-and-steel", 1]);
@@ -861,8 +861,7 @@ async function importCharacter(targetActor, jsonBuild) {
             var itemAmount = arrayKit[ref][1];
             const clonedData = action.clone().toObject();
             clonedData.system.quantity = itemAmount;
-            if (backpackInstance?.id)
-              clonedData.containerId.value = backpackInstance.id;
+            clonedData.system.containerId = backpackInstance?.id;
             allItems.push(clonedData);
           }
         }
@@ -1158,7 +1157,7 @@ async function addFeatItems(targetActor, arrayFeats) {
           if (itemExtra != null) {
             displayName += " (" + itemExtra + ")";
           }
-          const clonedData = action.clone().toObject();
+          const clonedData = action.toObject();
           clonedData.name = displayName;
 
           try {
@@ -1273,7 +1272,7 @@ async function addAncestryFeatureFeatItems(targetActor, arraySpecials) {
   checkAllFinishedAndCreate(targetActor);
 }
 
-async function addClassFeatureItems(targetActor, arraySpecials, arrayCF) {
+async function addClassFeatureItems(targetActor, arraySpecials, specialClassFeatures, arrayCF) {
   let content = await game.packs.get("pf2e.classfeatures").getDocuments();
   for (const action of content.filter((item) =>
     specialIsRequired(item, arraySpecials)
@@ -1292,6 +1291,23 @@ async function addClassFeatureItems(targetActor, arraySpecials, arrayCF) {
     }
   }
 
+  for (const action of content.filter((item) =>
+  specialIsRequired(item, specialClassFeatures)
+)) {
+  for (var ref in specialClassFeatures) {
+    if (specialClassFeatures.hasOwnProperty(ref)) {
+      var itemName = specialClassFeatures[ref];
+      if (
+        isNameMatch(itemName, action.slug) &&
+        needsNewInstanceofItem(targetActor, itemName)
+      ) {
+        addedItems.push(itemName);
+        allItems.push(action.toObject());
+      }
+    }
+  }
+}
+
   let classFeatures = arrayCF.map((a) => a.name);
   for (const action of content.filter((item) =>
     specialIsRequired(item, classFeatures)
@@ -1303,7 +1319,7 @@ async function addClassFeatureItems(targetActor, arraySpecials, arrayCF) {
         needsNewInstanceofItem(targetActor, itemName)
       ) {
         addedItems.push(itemName);
-        allItems.push(action.clone().toObject());
+        allItems.push(action.toObject());
       }
     }
   }
@@ -1689,7 +1705,7 @@ async function addLores(targetActor, arrayLores) {
         const data = {
           name: loreName,
           type: "lore",
-          data: loreData,
+          system: loreData,
         };
         arrayLoreData.push(data);
       } else {
@@ -1698,7 +1714,7 @@ async function addLores(targetActor, arrayLores) {
             if (targetActor.items[ref].name === loreName) {
               const update = {
                 id: targetActor.items[ref].id,
-                "data.proficient.value": loreProf / 2,
+                "system.proficient.value": loreProf / 2,
               };
               targetActor.updateEmbeddedEntity("Item", update); // Updates one EmbeddedEntity
             }
@@ -1778,8 +1794,8 @@ async function checkAllFinishedAndCreate(targetActor) {
           "flags.exportSource.coreVersion": game.version,
           "flags.pathbuilderID.value": buildID,
         });
-        targetActor.update({"data.resources.focus.max": focusPool,"data.resources.focus.value": focusPool,})
-        targetActor.update({ "data.attributes.hp.value": 1234 });
+        targetActor.update({"system.resources.focus.max": focusPool,"system.resources.focus.value": focusPool,})
+        targetActor.update({ "system.attributes.hp.value": 1234 });
         for (var ref in jsonBuild.specials) {
           if (jsonBuild.specials.hasOwnProperty(ref)) {
             var item = jsonBuild.specials[ref];
