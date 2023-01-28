@@ -4,11 +4,41 @@
   "description": "This module allows players and GMs to import player characters built in Pathbuilder 2e. NOT COMPATABLE WITH FOUNDRY v9",
   "author": "slate",
   "version": "0.10.0",
-  "minimumCoreVersion": "9.235",
-  "compatibleCoreVersion": "9.255",
+    "compatibility": {
+    "minimum": "10.286",
+    "verified": "10.286",
+    "maximum": "10"
+  },
+    "authors": [
+    {
+      "name": "Zach Armstrong (SLATE)",
+      "url": "https://github.com/zarmstrong",
+      "discord": "SLATE#0001",
+      "patreon": "slatesfoundrystuff",
+      "ko-fi": "SLATE"
+    },
+    {
+      "name": "anthonyhuber57",
+      "url": "https://github.com/anthonyhuber57"
+    }
+  ],
+  "compatibleCoreVersion": "10",
   "esmodules": [
         "pathbuilder-import-min.js"
     ],
+    "relationship": {
+    "systems": [
+      {
+        "id": "pf2e",
+        "type": "system",
+        "manifest": "https://github.com/foundryvtt/pf2e/releases/download/latest/system.json",
+        "compatibility": {
+          "minimum": "4.1.2",
+          "verified": "4.1.2"
+        }
+      }
+    ]
+  },
   "styles": [],
   "packs": [],
   "license": "MIT",
@@ -18,6 +48,7 @@
   "changelog": "https://github.com/zarmstrong/foundry-pathbuilder2e-import/blob/master/CHANGELOG.md",
   "bugs": "https://github.com/zarmstrong/herovau.lt-foundry/issues",
   "flags": {
-    "allowBugReporter": false
-  }
+    "manifestPlusVersion": "1.2.0",
+    "allowBugReporter": true
+  },
 }
