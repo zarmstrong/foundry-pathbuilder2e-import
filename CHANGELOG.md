@@ -1,3 +1,7 @@
+## 0.10.0 (Jan 28, 2023)
+
+* updates for v10 (thanks @anthonyhuber57)
+
 ## 0.9.1 (Mar 7, 2022)
 
 * fix error message
