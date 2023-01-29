@@ -1,3 +1,7 @@
+## 0.10.1 (Jan 29, 2023)
+
+* fix a bad merge to make this thing work :)
+
 ## 0.10.0 (Jan 28, 2023)
 
 * updates for v10 (thanks @anthonyhuber57)
