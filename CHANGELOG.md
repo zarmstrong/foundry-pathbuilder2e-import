@@ -1,3 +1,7 @@
+## 0.10.2 (Jan 29, 2023)
+
+* small change to module.json
+
 ## 0.10.1 (Jan 29, 2023)
 
 * fix a bad merge to make this thing work :)
